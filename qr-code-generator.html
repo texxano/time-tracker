@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texxano QR Check-in Code Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        #qrcode {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            min-height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #qrcode canvas,
+        #qrcode img {
+            max-width: 100%;
+            height: auto;
+        }
+        .deep-link {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 16px;
+            text-align: center;
+            color: #2e7d32;
+        }
+        .button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #1976D2;
+        }
+        .button-test {
+            background: #4CAF50;
+        }
+        .button-test:hover {
+            background: #45a049;
+        }
+        .instructions {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .instructions ul {
+            margin-bottom: 0;
+        }
+        .instructions li {
+            margin: 8px 0;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔲 Texxano QR Check-in Code</h1>
+        <p class="subtitle">Generate QR code for employee check-in</p>
+        
+        <div class="deep-link">
+            texxano://checkin
+        </div>
+        
+        <div id="qrcode"></div>
+        
+        <div style="text-align: center;">
+            <button class="button" onclick="downloadQR()">📥 Download QR Code</button>
+            <button class="button button-test" onclick="testDeepLink()">🧪 Test Deep Link</button>
+            <p style="color: #666; font-size: 14px; margin-top: 15px;">
+                Or right-click the QR code above and select "Save image as..."
+            </p>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ul>
+                <li><strong>Download</strong>: Click "Download QR Code" to save the image</li>
+                <li><strong>Print</strong>: Print the QR code at least 2x2 inches (5x5 cm) for easy scanning</li>
+                <li><strong>Place</strong>: Position at entrance/exit or time clock area</li>
+                <li><strong>Test</strong>: Click "Test Deep Link" on your mobile device to verify it works</li>
+                <li><strong>Protect</strong>: Laminate or use plastic sleeve to protect the QR code</li>
+            </ul>
+        </div>
+        
+        <div class="instructions" style="background: #d1ecf1; border-left-color: #0c5460;">
+            <h3 style="color: #0c5460;">ℹ️ How it works:</h3>
+            <ul style="color: #0c5460;">
+                <li>Employee scans QR code with phone camera</li>
+                <li>Texxano app opens automatically (even if closed)</li>
+                <li>Welcome modal appears</li>
+                <li>Time tracking starts automatically</li>
+                <li>Employee can continue working</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        // Generate QR code when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const deepLink = 'texxano://checkin';
+            const qrcodeContainer = document.getElementById("qrcode");
+            
+            // Clear any existing content
+            qrcodeContainer.innerHTML = '';
+            
+            // Generate QR code
+            new QRCode(qrcodeContainer, {
+                text: deepLink,
+                width: 300,
+                height: 300,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        });
+
+        function downloadQR() {
+            const qrcodeDiv = document.getElementById("qrcode");
+            const img = qrcodeDiv.querySelector('img');
+            const canvas = qrcodeDiv.querySelector('canvas');
+            
+            if (img && img.src) {
+                // Create a temporary canvas to ensure proper download
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = img.width;
+                tempCanvas.height = img.height;
+                const ctx = tempCanvas.getContext('2d');
+                
+                // Draw image on canvas
+                const tempImg = new Image();
+                tempImg.onload = function() {
+                    ctx.drawImage(tempImg, 0, 0);
+                    
+                    // Download from canvas
+                    tempCanvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.download = 'texxano-checkin-qr-code.png';
+                        link.href = url;
+                        link.click();
+                        URL.revokeObjectURL(url);
+                    });
+                };
+                tempImg.src = img.src;
+            } else if (canvas) {
+                // Download from canvas directly
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = 'texxano-checkin-qr-code.png';
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                });
+            } else {
+                alert('QR code not ready. Please wait a moment and try again.');
+            }
+        }
+
+        function testDeepLink() {
+            window.location.href = 'texxano://checkin';
+        }
+    </script>
+</body>
+</html>

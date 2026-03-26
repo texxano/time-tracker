@@ -1,0 +1,5 @@
+export const openAiTypes = {
+    OPEN_AI_REQUEST: 'OPEN_AI_REQUEST',
+    OPEN_AI_SUCCESS: 'OPEN_AI_SUCCESS',
+    OPEN_AI_FAILURE: 'OPEN_AI_FAILURE'
+};

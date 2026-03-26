@@ -1,0 +1,5 @@
+export const teamsTypes = {
+    TEAMS_REQUEST: 'TEAMS_REQUEST',
+    TEAMS_SUCCESS: 'TEAMS_SUCCESS',
+    TEAMS_FAILURE: 'TEAMS_FAILURE'
+};

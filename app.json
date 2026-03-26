@@ -1,0 +1,157 @@
+{
+  "expo": {
+    "name": "Texxano",
+    "slug": "texxanoApp",
+    "scheme": "texxano",
+    "version": "1.4.6",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "enabled": true,
+      "url": "https://u.expo.dev/2020fb3f-8a83-4c22-8e09-c583d37142dd",
+      "fallbackToCacheTimeout": 0,
+      "checkAutomatically": "ON_LOAD"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "buildNumber": "60",
+      "bundleIdentifier": "texxano.v1.ios",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Location permission is needed in order to track and log device location!",
+        "NSLocationAlwaysUsageDescription": "Location permission is required for background location tracking.",
+         "NSCameraUsageDescription": "We need access to your camera to take photos.",
+         "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location even in the background to track your position continuously.",
+        "UIBackgroundModes": [
+          "location",
+          "remote-notification",
+          "location",
+          "remote-notification"
+        ],
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyCg08_nX1c9snDiLRB8vXPwLdOkZe17f3Y"
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
+    },
+    "android": {
+      "versionCode": 64,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": false,
+          "data": [
+            {
+              "scheme": "texxano",
+              "host": "checkin"
+            },
+            {
+              "scheme": "texxano"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
+      "permissions": [
+        "CAMERA",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.INTERNET",
+        "android.permission.VIBRATE",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.WAKE_LOCK"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCg08_nX1c9snDiLRB8vXPwLdOkZe17f3Y"
+        },
+        "supports16kbPages": true
+      },
+      "package": "texxano.v1.android",
+      "googleServicesFile": "./google-services.json",
+      "runtimeVersion": "1.0.0",
+      "compileSdkVersion": 35,
+      "targetSdkVersion": 35,
+      "minSdkVersion": 24
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-file-system",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/notification.mp3"]
+        }
+      ],
+      [
+        "react-native-document-scanner-plugin",
+        {
+          "cameraPermission": "We need camera access, so you can scan documents"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location for GPS tracking.",
+          "locationAlwaysPermission": "Allow $(PRODUCT_NAME) to use your location in background for geofencing.",
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "minSdkVersion": 24,
+            "buildToolsVersion": "35.0.0",
+            "ndkVersion": "27.0.12077987",
+            "enable16KbPageSize": true
+          }
+        }
+      ]
+    ],
+    "userInterfaceStyle": "automatic",
+    "extra": {
+      "eas": {
+        "projectId": "2020fb3f-8a83-4c22-8e09-c583d37142dd"
+      }
+    }
+  }
+}

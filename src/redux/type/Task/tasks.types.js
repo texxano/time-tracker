@@ -1,0 +1,7 @@
+export const tasksTypes = {
+    TASK_REQUEST: 'TASK_REQUEST',
+    TASK_SUCCESS: 'TASK_SUCCESS',
+    TASK_FAILURE: 'TASK_FAILURE',
+    TASK_COUNT:'TASK_COUNT'
+
+};

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "247581226586",
+    "project_id": "texxano-app",
+    "storage_bucket": "texxano-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:247581226586:android:9328f80b2976128a324a63",
+        "android_client_info": {
+          "package_name": "texxano.v1.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7VFWlUfJsuBXzulY4fyEEN2-Scgrr2Ok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
