@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         paddingBottom: 15,
         paddingTop: 15,
+        backgroundColor:"#FFB020"
     },
     logo: {
         width: 50,

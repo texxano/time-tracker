@@ -8,12 +8,12 @@
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "resizeMode": "cover",
+      "backgroundColor": "#FFB020"
     },
     "updates": {
       "enabled": true,
-      "url": "https://u.expo.dev/2020fb3f-8a83-4c22-8e09-c583d37142dd",
+      "url": "https://u.expo.dev/330309e1-098b-45e4-94ae-b4dbe715f332",
       "fallbackToCacheTimeout": 0,
       "checkAutomatically": "ON_LOAD"
     },
@@ -24,8 +24,8 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Location permission is needed in order to track and log device location!",
         "NSLocationAlwaysUsageDescription": "Location permission is required for background location tracking.",
-         "NSCameraUsageDescription": "We need access to your camera to take photos.",
-         "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location even in the background to track your position continuously.",
+        "NSCameraUsageDescription": "We need access to your camera to take photos.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location even in the background to track your position continuously.",
         "UIBackgroundModes": [
           "location",
           "remote-notification",
@@ -48,7 +48,7 @@
       "versionCode": 64,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#FFB020"
       },
       "intentFilters": [
         {
@@ -81,7 +81,14 @@
         "android.permission.INTERNET",
         "android.permission.VIBRATE",
         "android.permission.RECEIVE_BOOT_COMPLETED",
-        "android.permission.WAKE_LOCK"
+        "android.permission.WAKE_LOCK",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
       ],
       "config": {
         "googleMaps": {
@@ -105,8 +112,10 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#ffffff",
-          "sounds": ["./assets/notification.mp3"]
+          "color": "#FFB020",
+          "sounds": [
+            "./assets/notification.mp3"
+          ]
         }
       ],
       [
@@ -150,8 +159,9 @@
     "userInterfaceStyle": "automatic",
     "extra": {
       "eas": {
-        "projectId": "2020fb3f-8a83-4c22-8e09-c583d37142dd"
+        "projectId": "330309e1-098b-45e4-94ae-b4dbe715f332"
       }
-    }
+    },
+    "owner": "timetrackertexxano"
   }
 }
