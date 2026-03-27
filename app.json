@@ -2,7 +2,7 @@
   "expo": {
     "name": "Texxano Time Tracker",
     "slug": "texxano-time-tracker",
-    "scheme": "texxano-time-tracker",
+    "scheme": "texxano",
     "version": "1.4.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,19 +13,19 @@
     },
     "updates": {
       "enabled": true,
-      "url": "https://u.expo.dev/330309e1-098b-45e4-94ae-b4dbe715f332",
+      "url": "https://u.expo.dev/2020fb3f-8a83-4c22-8e09-c583d37142dd",
       "fallbackToCacheTimeout": 0,
       "checkAutomatically": "ON_LOAD"
     },
     "ios": {
       "supportsTablet": true,
       "buildNumber": "60",
-      "bundleIdentifier": "com.texxano.timetracker",
+      "bundleIdentifier": "texxano.v1.ios",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Location permission is needed in order to track and log device location!",
         "NSLocationAlwaysUsageDescription": "Location permission is required for background location tracking.",
-        "NSCameraUsageDescription": "We need access to your camera to take photos.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location even in the background to track your position continuously.",
+         "NSCameraUsageDescription": "We need access to your camera to take photos.",
+         "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location even in the background to track your position continuously.",
         "UIBackgroundModes": [
           "location",
           "remote-notification",
@@ -56,11 +56,11 @@
           "autoVerify": false,
           "data": [
             {
-              "scheme": "texxano-time-tracker",
+              "scheme": "texxano",
               "host": "checkin"
             },
             {
-              "scheme": "texxano-time-tracker"
+              "scheme": "texxano"
             }
           ],
           "category": [
@@ -81,14 +81,7 @@
         "android.permission.INTERNET",
         "android.permission.VIBRATE",
         "android.permission.RECEIVE_BOOT_COMPLETED",
-        "android.permission.WAKE_LOCK",
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.ACCESS_BACKGROUND_LOCATION",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_LOCATION"
+        "android.permission.WAKE_LOCK"
       ],
       "config": {
         "googleMaps": {
@@ -96,7 +89,7 @@
         },
         "supports16kbPages": true
       },
-      "package": "com.texxano.timetracker",
+      "package": "texxano.v1.android",
       "googleServicesFile": "./google-services.json",
       "runtimeVersion": "1.0.0",
       "compileSdkVersion": 35,
@@ -113,9 +106,7 @@
         {
           "icon": "./assets/icon.png",
           "color": "#ffffff",
-          "sounds": [
-            "./assets/notification.mp3"
-          ]
+          "sounds": ["./assets/notification.mp3"]
         }
       ],
       [
@@ -159,9 +150,8 @@
     "userInterfaceStyle": "automatic",
     "extra": {
       "eas": {
-        "projectId": "330309e1-098b-45e4-94ae-b4dbe715f332"
+        "projectId": "2020fb3f-8a83-4c22-8e09-c583d37142dd"
       }
-    },
-    "owner": "timetrackertexxano"
+    }
   }
 }

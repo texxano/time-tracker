@@ -483,7 +483,7 @@ const Dashboard = ({ navigation }) => {
             <UpdateBanner />
             
             {/* Ping-Pong Debug Panel - Shows notification logs when app is killed */}
-            <PingPongDebugPanel />
+         
             </ScrollView>
             {/* <View style={globalStyles.box}>
                 <FlatList

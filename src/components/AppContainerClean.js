@@ -16,7 +16,7 @@ import { updateUnreadCount } from "../redux/actions/Chat/Chat.actions";
 import { getMe } from "../redux/actions/UsersTeams/user.actions";
 import { handleNotificationResponse } from "../utils/notificationHandlers";
 import { CHAT_ENABLED } from "../utils/firebase";
-import { handleBackgroundNotification, initializeBackgroundNotifications } from "../utils/backgroundNotificationHandler";
+import { handleBackgroundNotification, initializeBackgroundNotifications, registerNotificationTask } from "../utils/backgroundNotificationHandler";
 import { startLocationUpdates, isTrackingLocation, setRealtimeGeofence, setMultipleGeofences, setGlobalProjectId, checkAndRestartTracking, startGpsStatusMonitoring, stopGpsStatusMonitoring, syncGeofenceStateFromAPI, syncGeofenceStoppedFromAPI } from "../utils/locationModule";
 import { startBackgroundLocation, stopBackgroundLocation, seedHeartbeatTimer } from "../services/appStatusService";
 import GeofenceModule from "../utils/geofenceModule";
@@ -353,6 +353,14 @@ const AppContainerClean = ({
           if (status !== 'granted') {
             return;
           }
+
+          // Register background notification task NOW — after permissions confirmed.
+          // registerNotificationTask() is also called at module load and on mount,
+          // but on a fresh install permissions aren't granted yet at those points,
+          // which causes a silent failure leaving the task unregistered.
+          // Calling it here guarantees registration completes at least once per granted session.
+          const registered = await registerNotificationTask();
+          console.log(`[NOTIF SETUP] Background notification task registered: ${registered}`);
 
           // Create notification channel
           await Notifications.setNotificationChannelAsync('chat-messages', {

@@ -3,12 +3,12 @@ import * as TaskManager from 'expo-task-manager';
 import { Platform, AppState } from 'react-native';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAutoStopThresholdMs } from '../services/appStatusService';
+import { getAutoStopThresholdMs, getTokenFromStorage, refreshTokenInBackground } from '../services/appStatusService';
+import { BASE_URL_API } from '../utils/settings';
 import { store } from '../redux/store/store';
 import { isInsideAnyGeofence } from './locationModule';
 import { timeTracksServices } from '../services/TimeTracks/timeTracks.services';
 import * as SharedTrackingState from './sharedTrackingState';
-import http from '../services/http';
 
 // Exported so index.js can import this module at root level (prevents Metro tree-shaking
 // and guarantees TaskManager.defineTask runs before React component tree mounts).
@@ -40,7 +40,7 @@ const persistPingPongLog = async (message, data = {}) => {
       timestamp,
       message,
       data,
-      appState: 'killed', // Assume killed if we're writing to persistence
+      appState: AppState.currentState || 'unknown',
     };
     
     // Get existing logs
@@ -65,14 +65,24 @@ const sendHeartbeatPong = async (trackId, pingTimestamp) => {
     const pingAt = new Date().toISOString();
     await persistPingPongLog('💓 PING RECEIVED', { trackId, pingTimestamp, receivedAt: pingAt });
     
-    // Check if token is available (Redux might not be hydrated in killed state)
+    // Try Redux store first (works when app is alive with hydrated store).
+    // Fall back to AsyncStorage when Redux is not hydrated (killed-state FCM wakeup) —
+    // this is the primary failure mode: Redux is empty on fresh JS runtime, so token is
+    // null and the pong is silently blocked. AsyncStorage survives app kill.
     const state = store.getState();
-    const hasToken = !!state?.userToken?.token;
+    let authToken = state?.userToken?.token;
+    
+    if (!authToken) {
+      await persistPingPongLog('⚠️ PONG: Redux token missing — falling back to AsyncStorage');
+      const storedTokens = await getTokenFromStorage(true);
+      authToken = storedTokens?.token;
+    }
+    
     const tokenExpiration = state?.userToken?.tokenExpiration;
     const isExpired = tokenExpiration && new Date(tokenExpiration * 1000) < new Date();
     
-    if (!hasToken) {
-      await persistPingPongLog('❌ PONG BLOCKED - No token available', {
+    if (!authToken) {
+      await persistPingPongLog('❌ PONG BLOCKED - No token available (Redux + AsyncStorage checked)', {
         reduxState: Object.keys(state || {}),
       });
       return;
@@ -97,10 +107,16 @@ const sendHeartbeatPong = async (trackId, pingTimestamp) => {
       try {
         const location = await Location.getLastKnownPositionAsync();
         if (location?.coords) {
+          // Only trust in-memory geofence state when the app was fully alive (React mounted).
+          // In a killed-state FCM wakeup _notificationHandlerRegistered is false, meaning
+          // _insideGeofences is an empty Map → isInsideAnyGeofence() returns false even when
+          // the user IS inside a geofence. Sending false triggers immediate backend auto-stop.
+          // Send null instead so the backend takes no geofence action on a killed-state pong.
+          const geofenceResult = _notificationHandlerRegistered ? isInsideAnyGeofence() : null;
           return {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-            isInside: await isInsideAnyGeofence(),
+            isInside: geofenceResult,
           };
         }
       } catch (e) { /* silent */ }
@@ -120,13 +136,52 @@ const sendHeartbeatPong = async (trackId, pingTimestamp) => {
       payload.isInsideGeofence = locationResult.isInside;
     }
     
-    // Call the heartbeat endpoint
-    // http.post returns parsed JSON body, NOT the Response object — no .status property
-    const responseData = await http.post('/users/heartbeat', payload);
-    
+    // Use direct fetch with an explicit token rather than http.post, which reads the
+    // token from the Redux store and would fail in killed-state (store not hydrated).
+    let fetchResponse = await fetch(`${BASE_URL_API}/users/heartbeat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    // If the token was expired the server returns 401/403.
+    // Attempt a silent refresh once and retry the pong before giving up.
+    if (fetchResponse.status === 401 || fetchResponse.status === 403) {
+      await persistPingPongLog('⚠️ PONG: token rejected (401/403) — attempting refresh');
+      const storedTokens = await getTokenFromStorage(true);
+      if (storedTokens?.refreshToken && storedTokens?.userId) {
+        const newTokens = await refreshTokenInBackground(storedTokens.refreshToken, storedTokens.userId);
+        if (newTokens?.token) {
+          fetchResponse = await fetch(`${BASE_URL_API}/users/heartbeat`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${newTokens.token}`,
+            },
+            body: JSON.stringify(payload),
+          });
+        }
+      }
+    }
+
     const userId = store.getState()?.userDataRole?.userId || 'unknown';
     const pongAt = new Date().toISOString();
     const elapsed = Math.round((new Date(pongAt) - new Date(pingAt)) / 1000);
+
+    if (!fetchResponse.ok) {
+      await persistPingPongLog('❌ PONG HTTP ERROR', {
+        trackId,
+        userId,
+        status: fetchResponse.status,
+        elapsedSec: elapsed,
+      });
+      return;
+    }
+
+    const responseData = await fetchResponse.json().catch(() => null);
     await persistPingPongLog('✅ PONG SENT', { 
       trackId, 
       userId,
@@ -326,17 +381,25 @@ try {
 const registerNotificationTask = async () => {
   try {
     if (!notificationTaskDefined) {
+      console.log('[NOTIF TASK] Cannot register — task definition failed');
+      await persistPingPongLog('❌ [TASK REG] Task definition failed — cannot register');
       return false;
     }
     
     const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_NOTIFICATION_TASK);
     if (isRegistered) {
+      console.log('[NOTIF TASK] Already registered');
+      await persistPingPongLog('✅ [TASK REG] Already registered with OS');
       return true;
     }
     
     await Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
+    console.log('[NOTIF TASK] Registered successfully');
+    await persistPingPongLog('✅ [TASK REG] Registered successfully with OS');
     return true;
   } catch (error) {
+    console.log('[NOTIF TASK] Registration failed:', error?.message || String(error));
+    await persistPingPongLog('❌ [TASK REG] Registration FAILED', { error: error?.message || String(error) });
     return false;
   }
 };

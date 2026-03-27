@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert, Share } from 'react-native';
+import * as TaskManager from 'expo-task-manager';
+
+const BACKGROUND_NOTIFICATION_TASK = 'TEXXANO-BACKGROUND-NOTIFICATION-TASK';
 import { 
   readPingPongLogs, 
   clearPingPongLogs, 
@@ -33,19 +36,23 @@ const PingPongDebugPanel = () => {
   const [lastTimes, setLastTimes] = useState({ lastPing: null, lastPong: null });
   const [expanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [taskRegistered, setTaskRegistered] = useState(null);
+  const autoRefreshRef = useRef(null);
 
   const loadLogs = async () => {
     setLoading(true);
     try {
-      const [logsData, statsData, timesData] = await Promise.all([
+      const [logsData, statsData, timesData, isRegistered] = await Promise.all([
         readPingPongLogs(),
         countPingPongEvents(),
         getLastPingPongTimes(),
+        TaskManager.isTaskRegisteredAsync(BACKGROUND_NOTIFICATION_TASK),
       ]);
       
       setLogs(logsData);
       setStats(statsData);
       setLastTimes(timesData);
+      setTaskRegistered(isRegistered);
     } catch (error) {
       console.error('Failed to load ping-pong logs:', error);
     } finally {
@@ -56,6 +63,16 @@ const PingPongDebugPanel = () => {
   useEffect(() => {
     loadLogs();
   }, []);
+
+  // Auto-refresh every 5s when expanded so killed-state logs appear without manual reload
+  useEffect(() => {
+    if (expanded) {
+      autoRefreshRef.current = setInterval(loadLogs, 5000);
+    } else {
+      clearInterval(autoRefreshRef.current);
+    }
+    return () => clearInterval(autoRefreshRef.current);
+  }, [expanded]);
 
   const handleExport = async () => {
     try {
@@ -106,6 +123,17 @@ const PingPongDebugPanel = () => {
           <Text style={styles.badgeText}>{logs.length}</Text>
         </View>
       </TouchableOpacity>
+
+      {/* Task Registration Status */}
+      <View style={styles.taskStatus}>
+        <Text style={[
+          styles.taskStatusText,
+          taskRegistered === true && styles.taskStatusOk,
+          taskRegistered === false && styles.taskStatusFail,
+        ]}>
+          {taskRegistered === null ? '⏳ Task: checking...' : taskRegistered ? '✅ Task: Registered' : '❌ Task: NOT registered'}
+        </Text>
+      </View>
 
       {/* Stats Summary (always visible) */}
       <View style={styles.stats}>
@@ -231,6 +259,22 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#fff',
     fontSize: 12,
+    fontWeight: 'bold',
+  },
+  taskStatus: {
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+  },
+  taskStatusText: {
+    fontSize: 13,
+    color: '#aaa',
+  },
+  taskStatusOk: {
+    color: '#4CAF50',
+  },
+  taskStatusFail: {
+    color: '#F44336',
     fontWeight: 'bold',
   },
   stats: {

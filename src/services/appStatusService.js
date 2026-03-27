@@ -101,7 +101,7 @@ try {
 export const HEARTBEAT_MODULE_LOADED = true;
 export const isHeartbeatTaskDefined = () => heartbeatTaskDefined;
 
-const getTokenFromStorage = async (silent = false) => {
+export const getTokenFromStorage = async (silent = false) => {
   try {
     const persistedData = await AsyncStorage.getItem('persist:TEXXANO');
     if (!persistedData) {
@@ -135,7 +135,7 @@ const getTokenFromStorage = async (silent = false) => {
   }
 };
 
-const refreshTokenInBackground = async (refreshToken, userId) => {
+export const refreshTokenInBackground = async (refreshToken, userId) => {
   try {
     if (!refreshToken || !userId) {
       return null;

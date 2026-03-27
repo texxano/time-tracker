@@ -241,6 +241,7 @@ export async function markWorkStopped() {
   _startedAt = null;
   _companyLocationId = null;
   _isStartInProgress = false;
+  _lastStartTimestamp = 0; // Clear so cooldown doesn't fire on next track start verification
   
   // Also clear the active track data key shared by locationModule & geofenceModule.
   // Without this, the background task reloads a stale track and locationModule's

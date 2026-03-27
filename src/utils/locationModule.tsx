@@ -67,12 +67,13 @@ type WorkingHoursConfig = {
 };
 
 // Default: 07:30 - 20:30
+// TODO: Re-enable for production (set enabled: true)
 const DEFAULT_WORKING_HOURS: WorkingHoursConfig = {
   startHour: 7,
   startMinute: 30,
   endHour: 20,
   endMinute: 30,
-  enabled: true,
+  enabled: false, // TESTING: disabled to allow geofence auto-start at any hour
 };
 
 let _workingHours: WorkingHoursConfig = { ...DEFAULT_WORKING_HOURS };
@@ -397,16 +398,6 @@ async function handleGeofenceApiCall(
       if (!isWithinWorkingHours()) {
         console.log("⚠️ SKIPPING START - Outside working hours (20:30 - 07:30 quiet period)");
         dbLog("API", "Skipped START - outside working hours");
-        return;
-      }
-      
-      // ── Step 0b: Check STOP cooldown - prevents auto-restart after manual QR stop
-      // When user manually stops via QR, they expect tracking to STAY stopped
-      // even if they remain inside the geofence. Cooldown prevents immediate restart.
-      if (SharedTrackingState.isInStopCooldown()) {
-        const remainingSec = Math.round(SharedTrackingState.getStopCooldownRemaining() / 1000);
-        console.log(`⚠️ SKIPPING RECOVERY START - Within cooldown (${remainingSec}s remaining after manual stop)`);
-        dbLog("API", `Skipped recovery START - cooldown active (${remainingSec}s)`);
         return;
       }
       
