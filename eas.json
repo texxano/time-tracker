@@ -1,74 +1,21 @@
 {
   "cli": {
-    "version": ">= 3.7.2",
-    "appVersionSource": "local"
+    "version": ">= 16.20.4",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
-      "distribution": "internal",
       "developmentClient": true,
-      "android": {
-        "gradleCommand": ":app:assembleDebug"
-      },
-      "ios": {
-        "buildConfiguration": "Debug",
-        "resourceClass": "m1-medium"
-
-      },
+      "distribution": "internal",
       "channel": "development"
-    },
-    "pnevmatic-repo": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
-      "ios": {
-        "resourceClass": "m1-medium"
-      },
-      "channel": "pnevmatic-repo"
-    },
-    "pnevmatic-repo-prod": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
-      "ios": {
-        "resourceClass": "m1-medium"
-      },
-      "channel": "pnevmatic-repo-prod"
-    },
-        "pnevmatic-repo-tst": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
-      "ios": {
-        "resourceClass": "m1-medium"
-      },
-      "channel": "pnevmatic-repo-tst"
     },
     "preview": {
       "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
-      "ios": {
-        "resourceClass": "m1-medium"
-      },
       "channel": "preview"
     },
     "production": {
-      "android": {
-        "buildType": "app-bundle",
-        "gradleCommand": ":app:bundleRelease"
-      },
-      "ios": {
-        "resourceClass": "m1-medium"
-      },
-      "channel": "production",
-      "env": {
-        "EXPO_PUBLIC_16KB_PAGE_SIZE": "true"
-      }
+      "autoIncrement": true,
+      "channel": "production"
     }
   },
   "submit": {
